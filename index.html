@@ -1,61 +1,83 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>U.S. Air Quality Awareness Map</title>
-  <link rel="stylesheet" href="https://js.arcgis.com/4.29/esri/themes/light/main.css" />
-  <script src="https://js.arcgis.com/4.29/"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <title>Data Collector for AGOL</title>
+
   <style>
-    html, body, #viewDiv {
+    html,
+    body {
       margin: 0;
       padding: 0;
       height: 100%;
       width: 100%;
     }
-    #header {
+
+    #appContainer {
+      position: relative;
+      height: 100%;
+      width: 100%;
+    }
+
+    #viewDiv {
+      height: 100%;
+      width: 100%;
+    }
+
+    .addRecordBtn {
       position: absolute;
+      z-index: 99; /* ensure it's above the map and widgets */
       top: 10px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 99;
-      background: white;
-      padding: 10px 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-      font-family: Arial, sans-serif;
+      right: 10px;
+      background-color: #0079c1;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      font-size: 14px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    .addRecordBtn:hover {
+      background-color: #005a87;
     }
   </style>
-</head>
-<body>
-  <div id="header">U.S. Air Quality Awareness Map</div>
-  <div id="viewDiv"></div>
+
+  <link rel="stylesheet" href="https://js.arcgis.com/4.26/esri/themes/light/main.css" />
+  <script src="https://js.arcgis.com/4.26/"></script>
+
   <script>
     require([
+      "esri/config",
       "esri/Map",
       "esri/views/MapView",
+      "esri/widgets/Locate",
       "esri/widgets/Search",
-      "esri/layers/FeatureLayer",
-      "esri/config"
-    ], function (Map, MapView, Search, FeatureLayer, esriConfig) {
-  
-      // 🔑 Insert your API key here
-      esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurEMEVQbKvAbZnpzPKZRxuMNtUzDq8ag3E3FbEUVJMU0hrtmVGRJepK1vokNRd6QHYHvJ59WIxIBvBCEs9cPVdWnD4aXedEaWZSNwNzqqh5gyGL2CcmseyfeF5Gt8e3Mi7KdSA7BcKz3dTA6_yKBu_g1SbTFM-Zp9MUafCKP5vn2qhGgQBFLx91QEhf6EinAD207CcjqmQhLAFQ4sF6MsT9U.AT1_xORu7DFJ";
-  
+      "esri/layers/FeatureLayer"
+    ], (esriConfig, Map, MapView, Locate, Search, FeatureLayer) => {
+
+    
+      esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurEMEVQbKvAbZnpzPKZRxuMNtUzDq8ag3E3FbEUVJMU0hrtmVGRJepK1vokNRd6QHYHvJ59WIxIBvBCEs9cPVdWnD4aXedEaWZSNwNzqqh5gyGL2CcmseyfeF5Gt8e3Mi7KdSA7BcKz3dTA6_yKBu_g1SbTFM-Zp9MUafCKP5vn2qhGgQBFLx91QEhf6EinAD207CcjqmQhLAFQ4sF6MsT9U.AT1_xORu7DFJ
+";
+
       const map = new Map({
-        basemap: "streets-navigation-vector" // Requires API key
+        basemap: "satellite" // Basemap type
       });
-  
+
       const view = new MapView({
         container: "viewDiv",
         map: map,
-        center: [-98, 39],
+        center: [-98, 39], // Default center on the US
         zoom: 4
       });
-  
-      const search = new Search({ view: view });
-      view.ui.add(search, "top-right");
-  
+
+      const locateBtn = new Locate({
+        view: view
+      });
+
+      // Feature Layer for AQI data
       const aqiRenderer = {
         type: "simple",
         symbol: {
@@ -67,7 +89,7 @@
         visualVariables: [
           {
             type: "color",
-            field: "AQI",
+            field: "AQI", // Field to apply color on
             stops: [
               { value: 50, color: "green", label: "Good (0–50)" },
               { value: 100, color: "yellow", label: "Moderate (51–100)" },
@@ -76,7 +98,7 @@
           }
         ]
       };
-  
+
       const aqiLayer = new FeatureLayer({
         url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/AQI_Data/FeatureServer",
         outFields: ["*"],
@@ -86,9 +108,29 @@
           content: "AQI: {AQI}"
         }
       });
-  
+
       map.add(aqiLayer);
+
+      // Search widget to search for locations
+      const searchWidget = new Search({
+        view: view,
+        locationEnabled: true,
+        resultGraphicEnabled: true,
+        popupEnabled: true
+      });
+
+      view.when(() => {
+        view.ui.add(locateBtn, "top-left");
+        view.ui.add(searchWidget, "bottom-right");
+      });
+
     });
   </script>
+</head>
+<body>
+  <div id="appContainer">
+    <div id="viewDiv"></div>
+    <a href="https://arcg.is/1WzjCP1" target="_blank" class="addRecordBtn">Add Record</a>
+  </div>
 </body>
 </html>
