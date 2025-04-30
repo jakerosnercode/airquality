@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>U.S. Air Quality Awareness Map</title>
+  <link rel="stylesheet" href="https://js.arcgis.com/4.29/esri/themes/light/main.css" />
+  <script src="https://js.arcgis.com/4.29/"></script>
+  <style>
+    html, body, #viewDiv {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+    }
+    #header {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 99;
+      background: white;
+      padding: 10px 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+      font-family: Arial, sans-serif;
+    }
+  </style>
+</head>
+<body>
+  <div id="header">U.S. Air Quality Awareness Map</div>
+  <div id="viewDiv"></div>
+  <script>
+    require([
+      "esri/Map",
+      "esri/views/MapView",
+      "esri/layers/FeatureLayer",
+      "esri/Graphic",
+      "esri/widgets/Search",
+      "esri/geometry/Point"
+    ], (Map, MapView, FeatureLayer, Graphic, Search, Point) => {
+
+      const map = new Map({ basemap: "streets-navigation-vector" });
+
+      const view = new MapView({
+        container: "viewDiv",
+        map,
+        center: [-98, 39],
+        zoom: 4
+      });
+
+      const search = new Search({ view });
+      view.ui.add(search, "top-right");
+
+      const aqiRenderer = {
+        type: "simple",
+        symbol: {
+          type: "simple-marker",
+          style: "circle",
+          size: 12,
+          color: "gray"
+        },
+        visualVariables: [
+          {
+            type: "color",
+            field: "AQI",
+            stops: [
+              { value: 50, color: "green", label: "Good (0–50)" },
+              { value: 100, color: "yellow", label: "Moderate (51–100)" },
+              { value: 150, color: "red", label: "Unhealthy (101+)" }
+            ]
+          }
+        ]
+      };
+
+      const aqiLayer = new FeatureLayer({
+        url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/AQI_Data/FeatureServer",
+        outFields: ["*"],
+        renderer: aqiRenderer,
+        popupTemplate: {
+          title: "{City}, {State}",
+          content: "AQI: {AQI}"
+        }
+      });
+
+      map.add(aqiLayer);
+    });
+  </script>
+</body>
+</html>
