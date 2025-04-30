@@ -34,24 +34,28 @@
     require([
       "esri/Map",
       "esri/views/MapView",
-      "esri/layers/FeatureLayer",
-      "esri/Graphic",
       "esri/widgets/Search",
-      "esri/geometry/Point"
-    ], (Map, MapView, FeatureLayer, Graphic, Search, Point) => {
-
-      const map = new Map({ basemap: "streets-navigation-vector" });
-
+      "esri/layers/FeatureLayer",
+      "esri/config"
+    ], function (Map, MapView, Search, FeatureLayer, esriConfig) {
+  
+      // 🔑 Insert your API key here
+      esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurEMEVQbKvAbZnpzPKZRxuMNtUzDq8ag3E3FbEUVJMU0hrtmVGRJepK1vokNRd6QHYHvJ59WIxIBvBCEs9cPVdWnD4aXedEaWZSNwNzqqh5gyGL2CcmseyfeF5Gt8e3Mi7KdSA7BcKz3dTA6_yKBu_g1SbTFM-Zp9MUafCKP5vn2qhGgQBFLx91QEhf6EinAD207CcjqmQhLAFQ4sF6MsT9U.AT1_xORu7DFJ";
+  
+      const map = new Map({
+        basemap: "streets-navigation-vector" // Requires API key
+      });
+  
       const view = new MapView({
         container: "viewDiv",
-        map,
+        map: map,
         center: [-98, 39],
         zoom: 4
       });
-
-      const search = new Search({ view });
+  
+      const search = new Search({ view: view });
       view.ui.add(search, "top-right");
-
+  
       const aqiRenderer = {
         type: "simple",
         symbol: {
@@ -72,7 +76,7 @@
           }
         ]
       };
-
+  
       const aqiLayer = new FeatureLayer({
         url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/AQI_Data/FeatureServer",
         outFields: ["*"],
@@ -82,7 +86,7 @@
           content: "AQI: {AQI}"
         }
       });
-
+  
       map.add(aqiLayer);
     });
   </script>
