@@ -58,9 +58,7 @@
       "esri/layers/FeatureLayer"
     ], (esriConfig, Map, MapView, Locate, Search, FeatureLayer) => {
 
-    
-      esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurEMEVQbKvAbZnpzPKZRxuMNtUzDq8ag3E3FbEUVJMU0hrtmVGRJepK1vokNRd6QHYHvJ59WIxIBvBCEs9cPVdWnD4aXedEaWZSNwNzqqh5gyGL2CcmseyfeF5Gt8e3Mi7KdSA7BcKz3dTA6_yKBu_g1SbTFM-Zp9MUafCKP5vn2qhGgQBFLx91QEhf6EinAD207CcjqmQhLAFQ4sF6MsT9U.AT1_xORu7DFJ
-";
+      esriConfig.apiKey = "AAPTxy8BH1VEsoebNVZXo8HurEMEVQbKvAbZnpzPKZRxuMNtUzDq8ag3E3FbEUVJMU0hrtmVGRJepK1vokNRd6QHYHvJ59WIxIBvBCEs9cPVdWnD4aXedEaWZSNwNzqqh5gyGL2CcmseyfeF5Gt8e3Mi7KdSA7BcKz3dTA6_yKBu_g1SbTFM-Zp9MUafCKP5vn2qhGgQBFLx91QEhf6EinAD207CcjqmQhLAFQ4sF6MsT9U.AT1_xORu7DFJ";
 
       const map = new Map({
         basemap: "satellite" // Basemap type
@@ -89,7 +87,7 @@
         visualVariables: [
           {
             type: "color",
-            field: "AQI", // Field to apply color on
+            field: "AQI",
             stops: [
               { value: 50, color: "green", label: "Good (0–50)" },
               { value: 100, color: "yellow", label: "Moderate (51–100)" },
@@ -101,11 +99,11 @@
 
       const aqiLayer = new FeatureLayer({
         url: "https://services.arcgis.com/LBbVDC0hKPAnLRpO/arcgis/rest/services/AQI_Data/FeatureServer",
-        outFields: ["*"],
+        outFields: ["*"], // Ensure this is correct
         renderer: aqiRenderer,
         popupTemplate: {
           title: "{City}, {State}",
-          content: "AQI: {AQI}"
+          content: "AQI: {AQI}" // Make sure this field name is correct
         }
       });
 
